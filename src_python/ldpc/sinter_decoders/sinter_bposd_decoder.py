@@ -3,7 +3,7 @@ import numpy as np
 import pathlib
 from ldpc.bposd_decoder import BpOsdDecoder
 import sinter
-from beliefmatching import detector_error_model_to_check_matrices
+from ldpc.ckt_noise.dem_matrices import detector_error_model_to_check_matrices
 
 
 class SinterBpOsdDecoder(sinter.Decoder):
@@ -45,7 +45,6 @@ class SinterBpOsdDecoder(sinter.Decoder):
         osd_method="osd0",
         osd_order=0,
     ):
-
         self.max_iter = max_iter
         self.bp_method = bp_method
         self.ms_scaling_factor = ms_scaling_factor
@@ -96,7 +95,9 @@ class SinterBpOsdDecoder(sinter.Decoder):
                 via sinter deleting this directory after killing the decoder.
         """
         self.dem = stim.DetectorErrorModel.from_file(dem_path)
-        self.matrices = detector_error_model_to_check_matrices(self.dem)
+        self.matrices = detector_error_model_to_check_matrices(
+            self.dem, allow_undecomposed_hyperedges=True
+        )
         self.bposd = BpOsdDecoder(
             self.matrices.check_matrix,
             error_channel=list(self.matrices.priors),

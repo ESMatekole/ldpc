@@ -2,6 +2,7 @@ import numpy as np
 import warnings
 from scipy.sparse import spmatrix
 from typing import Union, List, Optional
+
 class BpOsdDecoder(BpDecoderBase):
     """
     Belief propagation and Ordered Statistic Decoding (OSD) decoder for binary linear codes.
@@ -45,6 +46,13 @@ class BpOsdDecoder(BpDecoderBase):
     method deallocates memory if it has been allocated.
     """
 
+    def __cinit__(self, pcm: Union[np.ndarray, spmatrix], error_rate: Optional[float] = None,
+                 error_channel: Optional[List[float]] = None, max_iter: Optional[int] = 0, bp_method: Optional[str] = 'minimum_sum',
+                 ms_scaling_factor: Optional[Union[float,int]] = 1.0, schedule: Optional[str] = 'parallel', omp_thread_count: Optional[int] = 1,
+                 random_schedule_seed: Optional[int] = 0, serial_schedule_order: Optional[List[int]] = None, osd_method: Union[str, int, float] = 0,
+                 osd_order: int = 0, input_vector_type: str = "syndrome", **kwargs): ...
+
+    def __del__(self): ...
 
     def decode(self, syndrome: np.ndarray) -> np.ndarray:
         """
@@ -79,6 +87,7 @@ class BpOsdDecoder(BpDecoderBase):
         """
 
 
+
     @property
     def osd_method(self) -> Optional[str]:
         """
@@ -90,7 +99,6 @@ class BpOsdDecoder(BpDecoderBase):
             A string representing the OSD method used. Must be one of {'OSD_0', 'OSD_E', 'OSD_CS'}. If no OSD method
             has been set, returns `None`.
         """
-
 
     @osd_method.setter
     def osd_method(self, method: Union[str, int, float]) -> None:
@@ -139,7 +147,6 @@ class BpOsdDecoder(BpDecoderBase):
 
         """
 
-
     @property
     def decoding(self) -> np.ndarray:
         """
@@ -148,7 +155,6 @@ class BpOsdDecoder(BpDecoderBase):
         Returns:
             np.ndarray: A numpy array containing the current decoded output.
         """
-
 
     @property
     def bp_decoding(self) -> np.ndarray:
@@ -159,6 +165,7 @@ class BpOsdDecoder(BpDecoderBase):
             np.ndarray: A numpy array containing the BP decoding output.
         """
 
+    
 
     @property
     def osd0_decoding(self) -> np.ndarray:
@@ -169,7 +176,6 @@ class BpOsdDecoder(BpDecoderBase):
             np.ndarray: A numpy array containing the current decoded output.
         """
 
-
     @property
     def osdw_decoding(self) -> np.ndarray:
         """
@@ -178,4 +184,3 @@ class BpOsdDecoder(BpDecoderBase):
         Returns:
             np.ndarray: A numpy array containing the current decoded output.
         """
-

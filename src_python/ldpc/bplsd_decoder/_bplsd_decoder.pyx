@@ -7,7 +7,6 @@ from ldpc.bposd_decoder cimport OsdMethod
 import warnings
 
 cdef class BpLsdDecoder(BpDecoderBase):
-  
     """
     A class representing a decoder that combines Belief Propagation (BP) with the Localised Statistics Decoder (LSD) algorithm.
 
@@ -45,6 +44,7 @@ cdef class BpLsdDecoder(BpDecoderBase):
     lsd_method: str, optional
         The LSD method of the LSD algorithm applied to each cluster. Must be one of {'LSD_0', 'LSD_E', 'LSD_CS'}.
         By default 'LSD_0'.
+    
     Notes
     -----
     The `BpLsdDecoder` class leverages soft information outputted by the BP decoder to guide the cluster growth
@@ -53,7 +53,7 @@ cdef class BpLsdDecoder(BpDecoderBase):
 
     def __cinit__(self, pcm: Union[np.ndarray, scipy.sparse.spmatrix], error_rate: Optional[float] = None,
                  error_channel: Optional[List[float]] = None, max_iter: Optional[int] = 0, bp_method: Optional[str] = 'minimum_sum',
-                 ms_scaling_factor: Optional[float] = 1.0, schedule: Optional[str] = 'parallel',
+                 ms_scaling_factor: Optional[Union[float,int]] = 1.0, schedule: Optional[str] = 'parallel',
                  omp_thread_count: Optional[int] = 1,
                  random_schedule_seed: Optional[int] = 0,
                  serial_schedule_order: Optional[List[int]] = None,
@@ -101,7 +101,6 @@ cdef class BpLsdDecoder(BpDecoderBase):
             del self.lsd
 
     def decode(self,syndrome):
-
         """
         Decodes the input syndrome using the belief propagation and LSD decoding methods.
 

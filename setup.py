@@ -8,85 +8,48 @@ import re
 
 ## cython stub files
 
+
 def generate_cython_stub_file(pyx_filepath: str, output_filepath: str) -> None:
-    with open(pyx_filepath, 'r') as f:
-        pyx_content = f.read()
+    pyi_content = ""
 
-    # Match function, class, and method definitions, and cdef/cpdef/cclass declarations
-    pattern = re.compile(r'(cdef class|class|cpdef|def)\s+[\w\[\],\s\*&\<\>\=\:]*')
-    # cimport_pattern = re.compile(r'from\s+libc\..+\s+cimport\s+')
+    # load file contents
+    pyx_content = open(pyx_filepath, "r").read()
 
-    # Split by lines and filter out lines without definitions
-    lines = pyx_content.split('\n')
-    new_lines = []
-    inside_docstring = False
-    inside_function = False
+    # Replace 'cimport' with 'import'
+    pyx_content = re.sub(r"\bcimport\b", "import", pyx_content)
 
-    for line in lines:
+    # strip cython syntax and comments
+    pyx_content = re.sub("cdef ", "", pyx_content)
+    pyx_content = re.sub(r"^\s*#.*\n", "", pyx_content, flags=re.MULTILINE)
 
-        if "__cinit__(" in line:
-            continue
+    # identify top-level import lines (including modified 'cimport' lines)
+    pattern = re.compile(r"^(import|from)\s+.*\n", re.MULTILINE)
+    for match in pattern.finditer(pyx_content):
+        pyi_content += pyx_content[match.start() : match.end()]
 
-        if "__del__(" in line:
-            continue
+    # identify patterns to ignore
+    ignore_pattern = re.compile(r"__cinit__\(|__del__\(")
 
-        line = line.replace('cdef class', 'class')
+    # identify class or function declarations
+    decorator = r"^\s*@.*?\n"
+    declaration = r"^\s*(?:class|def)\s+.*?:\s*\n"
+    docstring_double = r"\"\"\".*?\"\"\""
+    docstring_single = r"'''.*?'''"
+    docstring = rf"\s*?(?:{docstring_double}|{docstring_single})\s*?\n"
+    pattern = re.compile(
+        rf"({decorator})?({declaration})({docstring})?", re.DOTALL | re.MULTILINE
+    )
+    for match in pattern.finditer(pyx_content):
+        content = pyx_content[match.start() : match.end()]
+        if not ignore_pattern.match(content, re.MULTILINE):
+            pyi_content += content.rstrip()  # strip trailing whitespace
 
-        stripped_line = line.strip()
+            # If there is a docstring, we only need to add a newline character.
+            # Otherwise, we also need to add ellipses as a placeholder for the class/method "body".
+            suffix = "\n" if match.group(3) else " ...\n"
+            pyi_content += suffix
 
-        # Remove comments
-        if stripped_line.startswith('#'):
-            continue
-        
-        # # Skip cimport statements
-        # if stripped_line.startswith('cimport'):
-        #     new_lines.append(line)
-        #     continue
-
-        # if cimport_pattern.match(stripped_line):
-        #     new_lines.append(line)
-        #     continue
-
-        # Include import statements
-        if stripped_line.startswith('import') or stripped_line.startswith('from') or stripped_line.startswith('cimport'):
-            new_lines.append(line)
-            continue
-
-        # Handle docstrings
-        if inside_function:
-            if stripped_line.startswith('"""') or stripped_line.startswith("'''"):
-                new_lines.append(line)
-                # print(line)
-                inside_docstring = not inside_docstring
-                if not inside_docstring:
-                    inside_function = False
-                    new_lines.append('\n')
-                continue
-
-            elif inside_docstring:
-                new_lines.append(line)
-                # print(line)
-                continue
-
-        # Handle decorators
-        if stripped_line.startswith('@'):
-            decorator_found = True
-            new_lines.append(line)
-            continue
-
-
-        # Handle function and class definitions
-        if pattern.match(stripped_line):
-            print(stripped_line)
-
-            new_lines.append(line)
-            inside_function = True
-            # new_lines.append('\n')
-            continue
-
-    # Write the stripped content to an output file
-    with open(output_filepath, 'w') as f:
-        f.write('\n'.join(new_lines))
+    open(output_filepath, "w").write(pyi_content)
 
 
 ## BUILD
@@ -97,23 +60,34 @@ if sys.platform == "darwin":
 
 if sys.platform == "win32":
     compile_flags = ["/Ox", "/std:c++20"]
-    extra_link_args =[]
+    extra_link_args = []
     # compile_flags = ["/Ox", "/std:c++20",'-fopenmp']
     # extra_link_args =['-lgomp','-fopenmp'],
 else:
     compile_flags = ["-std=c++2a", "-O3"]
-    extra_link_args =[]
+    extra_link_args = []
     # compile_flags = ["-std=c++2a", "-O3", "-fopenmp"]
     # extra_link_args =['-lgomp','-fopenmp'],
 
 this_directory = Path(__file__).parent
 
-cpp_modules = ["bp_decoder", "bposd_decoder", "bp_flip", "belief_find_decoder", "mod2", "union_find_decoder", "bplsd_decoder"]
+cpp_modules = [
+    "bp_decoder",
+    "bposd_decoder",
+    "bp_flip",
+    "belief_find_decoder",
+    "mod2",
+    "union_find_decoder",
+    "bplsd_decoder",
+    "lsd_decoder"
+]
 
 c_extensions = []
 for module in cpp_modules:
-
-    generate_cython_stub_file(f"src_python/ldpc/{module}/_{module}.pyx", f"src_python/ldpc/{module}/__init__.pyi")
+    generate_cython_stub_file(
+        f"src_python/ldpc/{module}/_{module}.pyx",
+        f"src_python/ldpc/{module}/__init__.pyi",
+    )
 
     c_extensions.append(
         Extension(
@@ -121,7 +95,12 @@ for module in cpp_modules:
             sources=[f"src_python/ldpc/{module}/_{module}.pyx"],
             libraries=[],
             library_dirs=[],
-            include_dirs=[np.get_include(),'src_cpp', 'include/robin_map','include/ldpc/src_cpp'],
+            include_dirs=[
+                np.get_include(),
+                "src_cpp",
+                "include/robin_map",
+                "include/ldpc/src_cpp",
+            ],
             extra_compile_args=compile_flags,
             extra_link_args=extra_link_args,
             language="c++",

@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.sparse import spmatrix
+
 class UnionFindDecoder:
     """
     A decoder class that implements the Union Find Decoder (UFD) algorithm to decode binary linear codes. 
@@ -15,8 +16,11 @@ class UnionFindDecoder:
     uf_method : bool, optional
         If True, the decoder operates in matrix solve mode. If False, it operates in peeling mode. 
         Default is False.
-    """ 
+    """
+ 
+    def __cinit__(self, pcm: Union[np.ndarray, spmatrix], uf_method: str = False): ...
 
+    def __del__(self): ...
 
     def decode(self, syndrome: np.ndarray, llrs: np.ndarray = None, bits_per_step: int = 0) -> np.ndarray:
         """
@@ -45,6 +49,5 @@ class UnionFindDecoder:
             of the parity-check matrix.
         """
 
-
     @property
-    def decoding(self):
+    def decoding(self): ...

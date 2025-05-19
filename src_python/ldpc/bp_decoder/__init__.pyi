@@ -3,12 +3,21 @@ import scipy.sparse
 from typing import Optional, List, Union
 import warnings
 import ldpc.helpers.scipy_helpers
-def io_test(pcm: Union[scipy.sparse.spmatrix,np.ndarray]):
+
+
+def io_test(pcm: Union[scipy.sparse.spmatrix,np.ndarray]): ...
+
+
+
 class BpDecoderBase:
+
     """
     Bp Decoder base class
     """
 
+    def __cinit__(self,pcm, **kwargs): ...
+
+    def __del__(self): ...
 
     @property
     def error_rate(self) -> np.ndarray:
@@ -19,7 +28,6 @@ class BpDecoderBase:
             np.ndarray: A numpy array containing the current error rate vector.
         """
 
-
     @error_rate.setter
     def error_rate(self, value: Optional[float]) -> None:
         """
@@ -29,7 +37,6 @@ class BpDecoderBase:
             value (Optional[float]): The error rate value to be set. Must be a single float value.
         """
 
-
     @property
     def error_channel(self) -> np.ndarray:
         """
@@ -38,7 +45,6 @@ class BpDecoderBase:
         Returns:
             np.ndarray: A numpy array containing the current error channel vector.
         """
-
 
     @error_channel.setter
     def error_channel(self, value: Union[Optional[List[float]],np.ndarray]) -> None:
@@ -50,10 +56,12 @@ class BpDecoderBase:
             length of the code `self.n`.
         """
 
+    def update_channel_probs(self, value: Union[List[float],np.ndarray]) -> None: ...
 
-    def update_channel_probs(self, value: Union[List[float],np.ndarray]) -> None:
     @property
-    def channel_probs(self) -> np.ndarray:
+    def channel_probs(self) -> np.ndarray: ...
+
+
     @property
     def input_vector_type(self)-> str:
         """
@@ -83,7 +91,6 @@ class BpDecoderBase:
             np.ndarray: A numpy array containing the current log probability ratio vector.
         """
 
-
     @property
     def converge(self) -> bool:
         """
@@ -92,7 +99,6 @@ class BpDecoderBase:
         Returns:
             bool: True if the decoder has converged, False otherwise.
         """
-
 
     @property
     def iter(self) -> int:
@@ -113,7 +119,6 @@ class BpDecoderBase:
             int: The number of rows of the parity check matrix.
         """
 
-
     @property
     def bit_count(self) -> int:
         """
@@ -123,7 +128,6 @@ class BpDecoderBase:
             int: The number of columns of the parity check matrix.
         """
 
-
     @property
     def max_iter(self) -> int:
         """
@@ -132,7 +136,6 @@ class BpDecoderBase:
         Returns:
             int: The maximum number of iterations allowed by the decoder.
         """
-
 
     @max_iter.setter
     def max_iter(self, value: int) -> None:
@@ -146,7 +149,6 @@ class BpDecoderBase:
             ValueError: If value is not a positive integer.
         """
 
-
     @property
     def bp_method(self) -> str:
         """
@@ -155,7 +157,6 @@ class BpDecoderBase:
         Returns:
             str: The belief propagation method used. Possible values are 'product_sum' or 'minimum_sum'.
         """
-
 
     @bp_method.setter
     def bp_method(self, value: Union[str,int]) -> None:
@@ -169,7 +170,6 @@ class BpDecoderBase:
             ValueError: If value is not a valid option.
         """
 
-
     @property
     def schedule(self) -> str:
         """
@@ -178,7 +178,6 @@ class BpDecoderBase:
         Returns:
             str: The scheduling method used. Possible values are 'parallel' or 'serial'.
         """
-
 
     @schedule.setter
     def schedule(self, value: Union[str,int]) -> None:
@@ -192,7 +191,6 @@ class BpDecoderBase:
             ValueError: If value is not a valid option.
         """
 
-
     @property
     def serial_schedule_order(self) -> Union[None, np.ndarray]:
         """
@@ -201,7 +199,6 @@ class BpDecoderBase:
         Returns:
             Union[None, np.ndarray]: The serial schedule order as a numpy array, or None if no schedule has been set.
         """
-
 
     @serial_schedule_order.setter
     def serial_schedule_order(self, value: Union[None, List[int], np.ndarray]) -> None:
@@ -217,7 +214,6 @@ class BpDecoderBase:
             ValueError: If value contains an invalid integer value.
         """
 
-
     @property
     def ms_scaling_factor(self) -> float:
         """Get the scaling factor for minimum sum method.
@@ -225,7 +221,6 @@ class BpDecoderBase:
         Returns:
             float: The current scaling factor.
         """
-
 
     @ms_scaling_factor.setter
     def ms_scaling_factor(self, value: float) -> None:
@@ -238,7 +233,6 @@ class BpDecoderBase:
             TypeError: If the input value is not a float.
         """
 
-
     @property
     def omp_thread_count(self) -> int:
         """Get the number of OpenMP threads.
@@ -246,7 +240,6 @@ class BpDecoderBase:
         Returns:
             int: The number of threads used.
         """
-
 
     @omp_thread_count.setter
     def omp_thread_count(self, value: int) -> None:
@@ -259,7 +252,6 @@ class BpDecoderBase:
             TypeError: If the input value is not an integer or is less than 1.
         """
 
-
     @property
     def random_schedule_seed(self) -> int:
         """Get the value of random_schedule_seed.
@@ -267,7 +259,6 @@ class BpDecoderBase:
         Returns:
             int: The current value of random_schedule_seed.
         """
-
 
     @random_schedule_seed.setter
     def random_schedule_seed(self, value: int) -> None:
@@ -279,7 +270,6 @@ class BpDecoderBase:
         Raises:
             ValueError: If the input value is not a postive integer.
         """
-
 
 class BpDecoder(BpDecoderBase):
     """
@@ -317,8 +307,17 @@ class BpDecoder(BpDecoderBase):
         parity matrix is non-square the input vector type is inferred automatically from its length.
     """
 
+    def __cinit__(self, pcm: Union[np.ndarray, scipy.sparse.spmatrix], error_rate: Optional[float] = None,
+                 error_channel: Optional[Union[np.ndarray,List[float]]] = None, max_iter: Optional[int] = 0, bp_method: Optional[str] = 'minimum_sum',
+                 ms_scaling_factor: Optional[Union[float,int]] = 1.0, schedule: Optional[str] = 'parallel', omp_thread_count: Optional[int] = 1,
+                 random_schedule_seed: Optional[int] = 0, serial_schedule_order: Optional[List[int]] = None, input_vector_type: str = "auto", **kwargs): ...
 
     def __init__(self, pcm: Union[np.ndarray, scipy.sparse.spmatrix], error_rate: Optional[float] = None,
+                 error_channel: Optional[Union[np.ndarray,List[float]]] = None, max_iter: Optional[int] = 0, bp_method: Optional[str] = 'minimum_sum',
+                 ms_scaling_factor: Optional[Union[float,int]] = 1.0, schedule: Optional[str] = 'parallel', omp_thread_count: Optional[int] = 1,
+                 random_schedule_seed: Optional[int] = 0, serial_schedule_order: Optional[List[int]] = None,
+                 input_vector_type: str = "auto", **kwargs): ...
+
     def decode(self, input_vector: np.ndarray) -> np.ndarray:
         """
         Decode the input input_vector using belief propagation decoding algorithm.
@@ -338,7 +337,7 @@ class BpDecoder(BpDecoderBase):
         ValueError
             If the length of the input input_vector does not match the number of rows in the parity check matrix.
         """
-
+        
 
     @property
     def decoding(self) -> np.ndarray:
@@ -378,6 +377,9 @@ class SoftInfoBpDecoder(BpDecoderBase):
         The threshold value below which syndrome soft information is used.
     """
 
+    def __cinit__(self, pcm: Union[np.ndarray, spmatrix], error_rate: Optional[float] = None,
+                 error_channel: Optional[List[float]] = None, max_iter: Optional[int] = 0, bp_method: Optional[str] = 'minimum_sum',
+                 ms_scaling_factor: Optional[float] = 1.0, cutoff: Optional[float] = np.inf, sigma: float = 2.0, **kwargs): ...
 
     def decode(self, soft_info_syndrome: np.ndarray) -> np.ndarray:
         """
@@ -393,7 +395,6 @@ class SoftInfoBpDecoder(BpDecoderBase):
         np.ndarray
             A 1-dimensional numpy array containing the decoded output.
         """
-
 
     @property
     def soft_syndrome(self) -> np.ndarray:
@@ -413,4 +414,3 @@ class SoftInfoBpDecoder(BpDecoderBase):
         Returns:
             np.ndarray: A numpy array containing the current decoded output.
         """
-

@@ -1,8 +1,9 @@
 import numpy as np
 from scipy.sparse import spmatrix
 import json
-from ldpc.bposd_decoder cimport OsdMethod
+from ldpc.bposd_decoder import OsdMethod
 import warnings
+
 class BpLsdDecoder(BpDecoderBase):
     """
     A class representing a decoder that combines Belief Propagation (BP) with the Localised Statistics Decoder (LSD) algorithm.
@@ -41,12 +42,25 @@ class BpLsdDecoder(BpDecoderBase):
     lsd_method: str, optional
         The LSD method of the LSD algorithm applied to each cluster. Must be one of {'LSD_0', 'LSD_E', 'LSD_CS'}.
         By default 'LSD_0'.
+    
     Notes
     -----
     The `BpLsdDecoder` class leverages soft information outputted by the BP decoder to guide the cluster growth
     in the LSD algorithm. The number of bits added to the cluster in each step is controlled by the `bits_per_step` parameter.
     """
 
+    def __cinit__(self, pcm: Union[np.ndarray, scipy.sparse.spmatrix], error_rate: Optional[float] = None,
+                 error_channel: Optional[List[float]] = None, max_iter: Optional[int] = 0, bp_method: Optional[str] = 'minimum_sum',
+                 ms_scaling_factor: Optional[Union[float,int]] = 1.0, schedule: Optional[str] = 'parallel',
+                 omp_thread_count: Optional[int] = 1,
+                 random_schedule_seed: Optional[int] = 0,
+                 serial_schedule_order: Optional[List[int]] = None,
+                  bits_per_step:int = 1,
+                  input_vector_type: str = "syndrome",
+                  lsd_order: int = 0,
+                  lsd_method: Union[str, int] = 0, **kwargs): ...
+
+    def __del__(self): ...
 
     def decode(self,syndrome):
         """
@@ -71,7 +85,6 @@ class BpLsdDecoder(BpDecoderBase):
             If the length of the input syndrome is not equal to the length of the code.
         """
 
-
     @property
     def statistics(self) -> Statistics:
         """
@@ -81,7 +94,6 @@ class BpLsdDecoder(BpDecoderBase):
         Statistics
             The statistics object.
         """
-
 
     @property
     def do_stats(self) -> bool:
@@ -94,7 +106,6 @@ class BpLsdDecoder(BpDecoderBase):
             Whether the statistics are being collected.
         """
 
-
     def set_do_stats(self, value: bool) -> None:
         """
         Sets whether the statistics are being collected.
@@ -104,7 +115,6 @@ class BpLsdDecoder(BpDecoderBase):
         value : bool
             Whether the statistics are being collected.
         """
-
 
     @property
     def lsd_method(self) -> Optional[str]:
@@ -117,7 +127,6 @@ class BpLsdDecoder(BpDecoderBase):
             A string representing the LSD method used. Must be one of {'LSD_0', 'LSD_E', 'LSD_CS'}. If no LSD method
             has been set, returns `None`.
         """
-
 
     @lsd_method.setter
     def lsd_method(self, method: Union[str, int, float]) -> None:
@@ -166,7 +175,6 @@ class BpLsdDecoder(BpDecoderBase):
 
         """
 
-
     def set_additional_stat_fields(self, error, syndrome, compare_recover) -> None:
         """
         Sets additional fields to be collected in the statistics.
@@ -177,10 +185,8 @@ class BpLsdDecoder(BpDecoderBase):
             A list of strings representing the additional fields to be collected in the statistics.
         """
 
-
     def reset_cluster_stats(self) -> None:
         """
         Resets cluster statistics of the decoder.
         Note that this also resets the additional stat fields, such as the error, and compare_recovery vectors
         """
-

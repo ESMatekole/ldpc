@@ -687,8 +687,11 @@ namespace ldpc::gf2dense {
 
         CscMatrix ker = ldpc::gf2dense::kernel(row_count, col_count, csr_mat);
 
-
         CsrMatrix ker_csr = csc_to_csr(ker);
+
+        if(ker_csr.size() == 0){
+            return -1;
+        }
 
         int row_permutations = std::pow(2, ker_csr.size());
 
@@ -696,7 +699,7 @@ namespace ldpc::gf2dense {
 
         for (int i = 1; i < row_permutations; i++) {
 
-            std::vector<size_t> current_row(col_count, 0);
+            std::vector<uint8_t> current_row(col_count, 0);
 
             auto row_add_indices = ldpc::util::decimal_to_binary_sparse(i, ker_csr.size());
 
@@ -705,8 +708,10 @@ namespace ldpc::gf2dense {
                 for (auto col_index: ker_csr[row_index]) {
                     if (current_row[col_index] == 0) {
                         row_count++;
+                        current_row[col_index] = 1;
                     } else {
                         row_count--;
+                        current_row[col_index] = 0;
                     }
                 }
             }

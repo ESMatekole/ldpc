@@ -23,9 +23,9 @@ dependencies = [
     "pytest",
     "stim",
     "sinter",
-    "BeliefMatching"
+    "pymatching"
 ]
-version = "2.1.2"
+version = "2.3.4"
 
 [project.urls]
 Documentation = "https://software.roffe.eu/ldpc"

@@ -3,7 +3,7 @@ import numpy as np
 import pathlib
 from ldpc.belief_find_decoder import BeliefFindDecoder
 import sinter
-from beliefmatching import detector_error_model_to_check_matrices
+from ldpc.ckt_noise.dem_matrices import detector_error_model_to_check_matrices
 
 
 class SinterBeliefFindDecoder(sinter.Decoder):
@@ -70,7 +70,6 @@ class SinterBeliefFindDecoder(sinter.Decoder):
         uf_method="inversion",
         bits_per_step=0,
     ):
-
         self.max_iter = max_iter
         self.bp_method = bp_method
         self.ms_scaling_factor = ms_scaling_factor
@@ -121,7 +120,9 @@ class SinterBeliefFindDecoder(sinter.Decoder):
                 via sinter deleting this directory after killing the decoder.
         """
         self.dem = stim.DetectorErrorModel.from_file(dem_path)
-        self.matrices = detector_error_model_to_check_matrices(self.dem)
+        self.matrices = detector_error_model_to_check_matrices(
+            self.dem, allow_undecomposed_hyperedges=True
+        )
         self.belief_find = BeliefFindDecoder(
             self.matrices.check_matrix,
             error_channel=list(self.matrices.priors),

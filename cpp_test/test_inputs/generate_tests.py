@@ -27,7 +27,7 @@ def to_csr(mat: np.ndarray):
         first = True
         for j in range(n):
             if mat[i, j] == 1:
-                if first != True:
+                if first is not True:
                     csr_string += ","
                 first = False
                 csr_string += f"{j}"
@@ -190,9 +190,7 @@ def lu_solve_tests():
         n = np.random.randint(1, 500)
         m = np.random.randint(1, 500)
 
-        pcm = random_binary_matrix(
-            height=m, width=n, sparsity=0.01
-        )
+        pcm = random_binary_matrix(height=m, width=n, sparsity=0.01)
 
         # for _ in range(np.random.randint(10)):
         #     pcm[np.random.randint(0, m)] = pcm[np.random.randint(0, m)]

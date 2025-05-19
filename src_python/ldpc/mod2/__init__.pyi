@@ -3,12 +3,12 @@ import scipy.sparse
 import ldpc.mod2._legacy_v1
 import ldpc.helpers.scipy_helpers
 from typing import Tuple, Union, List
-from libc.stdint cimport uintptr_t
+from libc.stdint import uintptr_t
+
 def csc_to_scipy_sparse(vector[vector[int]]& col_adjacency_list):
     """
     Converts CSC matrix to sparse matrix
     """
-
 
 def rank(pcm: Union[scipy.sparse.spmatrix, np.ndarray], method: str = "dense") -> int:
     """
@@ -30,7 +30,6 @@ def rank(pcm: Union[scipy.sparse.spmatrix, np.ndarray], method: str = "dense") -
         The rank of the parity check matrix.
     """
 
-
 def nullspace(pcm: Union[scipy.sparse.spmatrix, np.ndarray], method = "dense") -> scipy.sparse.spmatrix:
     """
     Calculate the kernel of a given parity check matrix.
@@ -41,7 +40,6 @@ def nullspace(pcm: Union[scipy.sparse.spmatrix, np.ndarray], method = "dense") -
     Returns:
         scipy.sparse.spmatrix: The kernel of the parity check matrix.
     """
-
 
 def kernel(pcm: Union[scipy.sparse.spmatrix, np.ndarray], method = "dense") -> scipy.sparse.spmatrix:
     """
@@ -54,7 +52,6 @@ def kernel(pcm: Union[scipy.sparse.spmatrix, np.ndarray], method = "dense") -> s
         scipy.sparse.spmatrix: The kernel of the parity check matrix.
     """
 
-
 def row_complement_basis(pcm: Union[scipy.sparse.spmatrix, np.ndarray]) -> scipy.sparse.spmatrix:
     """
     Calculate the row complement basis of a given parity check matrix.
@@ -65,7 +62,6 @@ def row_complement_basis(pcm: Union[scipy.sparse.spmatrix, np.ndarray]) -> scipy
     Returns:
         scipy.sparse.spmatrix: The row complement basis of the parity check matrix.
     """
-
 
 def pivot_rows(mat: Union[np.ndarray,scipy.sparse.spmatrix]):
     """
@@ -85,14 +81,13 @@ def pivot_rows(mat: Union[np.ndarray,scipy.sparse.spmatrix]):
         A numpy array containing the pivot rows of the input matrix.
     """
 
-
 def io_test(pcm: Union[scipy.sparse.spmatrix,np.ndarray]):
     """
     Test function
     """
 
-
 def estimate_code_distance(pcm: Union[scipy.sparse.spmatrix,np.ndarray], timeout_seconds: float = 0.025, number_of_words_to_save = 10):
+
     """
     Estimate the code distance of a binary matrix representing a parity-check matrix.
 
@@ -122,7 +117,6 @@ def estimate_code_distance(pcm: Union[scipy.sparse.spmatrix,np.ndarray], timeout
         A sparse matrix containing the minimum-weight codewords found, up to `number_of_words_to_save`.
     """
 
-
 def row_span(pcm: Union[scipy.sparse.spmatrix,np.ndarray]) -> scipy.sparse.spmatrix:
     """
     Compute the row span of a given parity check matrix.
@@ -141,8 +135,8 @@ def row_span(pcm: Union[scipy.sparse.spmatrix,np.ndarray]) -> scipy.sparse.spmat
         The row span of the input matrix.
     """
 
-
 def compute_exact_code_distance(pcm: Union[scipy.sparse.spmatrix,np.ndarray]):
+
     """
     Compute the exact code distance of a binary matrix representing a parity-check matrix.
 
@@ -160,7 +154,6 @@ def compute_exact_code_distance(pcm: Union[scipy.sparse.spmatrix,np.ndarray]):
         The exact minimum distance of the code.
     """
 
-
 def row_basis(pcm: Union[scipy.sparse.spmatrix,np.ndarray]) -> scipy.sparse.spmatrix:
     """
     Compute the row basis of a given parity check matrix.
@@ -175,7 +168,6 @@ def row_basis(pcm: Union[scipy.sparse.spmatrix,np.ndarray]) -> scipy.sparse.spma
     scipy.sparse.spmatrix
         The row basis of the input matrix.
     """
-
 
 def row_echelon(matrix: Union[np.ndarray,scipy.sparse.spmatrix], full: bool = False) -> List[np.ndarray, int, np.ndarray, np.ndarray]:
     """
@@ -217,7 +209,6 @@ def row_echelon(matrix: Union[np.ndarray,scipy.sparse.spmatrix], full: bool = Fa
         [0 0 0]]
 
     """
-
 
 def reduced_row_echelon(matrix: Union[np.ndarray, scipy.sparse.spmatrix]) -> List[np.ndarray, int, np.ndarray, np.ndarray]:
     """
@@ -318,7 +309,11 @@ class PluDecomposition():
     """
 
 
-    def __init__(self, pcm: Union[scipy.sparse.spmatrix, np.ndarray], full_reduce: bool = False, lower_triangular: bool = True) -> None:
+    def __init__(self, pcm: Union[scipy.sparse.spmatrix, np.ndarray], full_reduce: bool = False, lower_triangular: bool = True) -> None: ...
+
+    def __cinit__(self, pcm: Union[scipy.sparse.spmatrix,np.ndarray], full_reduce: bool = False, lower_triangular: bool = True): ...
+
+
     def lu_solve(self, y: np.ndarray) -> np.ndarray:
         """
         Solve the LU decomposition problem for a given array 'y'.
@@ -330,7 +325,6 @@ class PluDecomposition():
             np.ndarray: Solution array.
         """
 
-
     @property
     def L(self) -> scipy.sparse.spmatrix:
         """
@@ -339,7 +333,6 @@ class PluDecomposition():
         Returns:
             scipy.sparse.spmatrix: Lower triangular matrix.
         """
-
 
     @property
     def U(self) -> scipy.sparse.spmatrix:
@@ -350,7 +343,6 @@ class PluDecomposition():
             scipy.sparse.spmatrix: Upper triangular matrix.
         """
 
-
     @property
     def P(self) -> scipy.sparse.spmatrix:
         """
@@ -359,7 +351,6 @@ class PluDecomposition():
         Returns:
             scipy.sparse.spmatrix: Permutation matrix.
         """
-
 
     @property
     def rank(self) -> int:
@@ -370,7 +361,6 @@ class PluDecomposition():
             int: Rank of the matrix.
         """
 
-
     @property
     def pivots(self) -> np.ndarray:
         """
@@ -380,3 +370,4 @@ class PluDecomposition():
             np.ndarray: Array of pivot positions.
         """
 
+    def __del__(self): ...
